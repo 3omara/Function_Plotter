@@ -72,6 +72,30 @@ class MainWindow(QMainWindow):
         container = QWidget()
         container.setLayout(root_layout)
         self.setCentralWidget(container)
+    
+    def plot_button_clicked(self):
+        equation = self.equation_text.text()
+        equation = "".join(equation.split())
+        min_x = self.min_x.text()
+        max_x = self.max_x.text()
+        sample_size = (int(max_x) - int(min_x))*100
+        x = np.linspace(int(min_x), int(max_x), sample_size)
+        y = self.equation_solver(equation, x)
+        
+        fig = Figure(figsize=(7, 5), dpi=100)
+        ax = fig.add_subplot(111)
+        max_range2 = max((int(max_x)), y[-1])
+        max_range1 = min((int(min_x)), y[0])
+        ax.set_xlim([max_range1, max_range2])
+        ax.set_ylim([max_range1, max_range2])
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.grid()
+        ax.plot(x, y)       
+        self.layout().itemAt(0).widget().layout().itemAt(2).widget().deleteLater()
+        canvas = FigureCanvas(fig)
+        self.layout().itemAt(0).widget().layout().addWidget(canvas)
+        canvas.draw()
 
     
     def equation_solver(self, equation, x_values):
@@ -96,7 +120,7 @@ class MainWindow(QMainWindow):
         order = [int(x - y) for x, y in zip(order, shifts)]
                     
 
-        print("order: ", order)
+        # print("order: ", order)
 
         for i in x_values:
             terms = re.split(r'([-/+*^])', equation)
@@ -116,7 +140,7 @@ class MainWindow(QMainWindow):
                     terms[op-1] = float(terms[op-1]) - float(terms[op+1])
                 terms.pop(op)
                 terms.pop(op)
-            print('i: {}, res: {}'.format(i, terms[0]))
+            # print('i: {}, res: {}'.format(i, terms[0]))
             y.append(terms[0])
                 
         
