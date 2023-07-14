@@ -51,12 +51,28 @@ class MainWindow(QMainWindow):
         x_layout.setSpacing(0)
         root_layout.addLayout(x_layout)
 
+        # canvas
+        grid = QGridLayout()
+        fig = Figure(figsize=(7, 5), dpi=100)
+        ax = fig.add_subplot(111)
+        ax.set_xticks(np.arange(-10, 11, 1))
+        ax.set_yticks(np.arange(-5, 101, 5))
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        x = np.linspace(-10, 10, 100)
+        y = self.equation_solver("x^2", x)
+        print(x)
+        print(y)
+        ax.grid()
+        ax.plot(x, y)
+        self.canvas = FigureCanvas(fig)
+        grid.addWidget(self.canvas, 0, 0)
+        root_layout.addWidget(self.canvas)
+
         container = QWidget()
         container.setLayout(root_layout)
         self.setCentralWidget(container)
 
-    def plot_button_clicked(self):
-        return
     
     def equation_solver(self, equation, x_values):
         y = []
