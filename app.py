@@ -5,7 +5,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import re
 
 from PySide2.QtCore import QSize, Qt
-from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QVBoxLayout, QWidget, QHBoxLayout, QLabel, QGridLayout
+from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QVBoxLayout, QWidget, QHBoxLayout, QLabel, QGridLayout, QMessageBox
 
 app = QApplication([])
 
@@ -55,14 +55,12 @@ class MainWindow(QMainWindow):
         grid = QGridLayout()
         fig = Figure(figsize=(7, 5), dpi=100)
         ax = fig.add_subplot(111)
-        ax.set_xticks(np.arange(-10, 11, 1))
-        ax.set_yticks(np.arange(-5, 101, 5))
+        # ax.set_xticks(np.arange(-10, 11, 1))
+        # ax.set_yticks(np.arange(-5, 101, 5))
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         x = np.linspace(-10, 10, 100)
-        y = self.equation_solver("x^2", x)
-        print(x)
-        print(y)
+        y = self.equation_solver(["x", "^", "2"], [1, 1, 1], x)
         ax.grid()
         ax.plot(x, y)
         self.canvas = FigureCanvas(fig)
@@ -75,13 +73,17 @@ class MainWindow(QMainWindow):
     
     def plot_button_clicked(self):
         equation = self.equation_text.text()
-        equation = "".join(equation.split())
+        terms, signs = self.validate_state_machine(equation)
+        if terms == "Syntax error":
+            self.user_message("Syntax error")
+            return
         min_x = self.min_x.text()
         max_x = self.max_x.text()
         sample_size = (int(max_x) - int(min_x))*100
         x = np.linspace(int(min_x), int(max_x), sample_size)
-        y = self.equation_solver(equation, x)
-        
+        y = self.equation_solver(terms, signs, x)
+        if y == -1:
+            return
         fig = Figure(figsize=(7, 5), dpi=100)
         ax = fig.add_subplot(111)
         max_range2 = max((int(max_x)), y[-1])
@@ -98,9 +100,10 @@ class MainWindow(QMainWindow):
         canvas.draw()
 
     
-    def equation_solver(self, equation, x_values):
+    def equation_solver(self, terms, signs, x_values):
         y = []
-        terms = re.split(r'([-/+*^])', equation)
+        print("signs: {}".format(signs))
+        print("terms: {}".format(terms))
         order = []
         for i in range(len(terms)):
             if terms[i] == '^':
@@ -118,33 +121,107 @@ class MainWindow(QMainWindow):
                 if order[j] < order[i]:
                     shifts[i] += 2
         order = [int(x - y) for x, y in zip(order, shifts)]
-                    
-
-        # print("order: ", order)
-
+        print("order: {}".format(order))
         for i in x_values:
-            terms = re.split(r'([-/+*^])', equation)
+            temp = terms.copy()
             for j in range(len(terms)):
-                if terms[j] == 'x':
-                    terms[j] = i
+                if temp[j] == 'x':
+                    temp[j] = i * signs[j]
+                else:
+                    try:
+                        temp[j] = float(temp[j]) * signs[j]
+                    except ValueError:
+                        pass
             for op in order:
-                if terms[op] == '^':
-                    terms[op-1] = float(terms[op-1]) ** float(terms[op+1])
-                elif terms[op] == '*':
-                    terms[op-1] = float(terms[op-1]) * float(terms[op+1])
-                elif terms[op] == '/':
-                    terms[op-1] = float(terms[op-1]) / float(terms[op+1])
-                elif terms[op] == '+':
-                    terms[op-1] = float(terms[op-1]) + float(terms[op+1])
-                elif terms[op] == '-':
-                    terms[op-1] = float(terms[op-1]) - float(terms[op+1])
-                terms.pop(op)
-                terms.pop(op)
-            # print('i: {}, res: {}'.format(i, terms[0]))
-            y.append(terms[0])
+                if temp[op] == '^':
+                    temp[op-1] = float(temp[op-1]) ** float(temp[op+1])
+                elif temp[op] == '*':
+                    temp[op-1] = float(temp[op-1]) * float(temp[op+1])
+                elif temp[op] == '/':
+                    temp[op-1] = float(temp[op-1]) / float(temp[op+1])
+                elif temp[op] == '+':
+                    temp[op-1] = float(temp[op-1]) + float(temp[op+1])
+                elif temp[op] == '-':
+                    temp[op-1] = float(temp[op-1]) - float(temp[op+1])
+                temp.pop(op)
+                temp.pop(op)
+            # print('i: {}, res: {}'.format(i, temp[0]))
+            y.append(temp[0])
                 
         
         return y
+    
+    def validate_state_machine(self, equation):
+        states = {
+            0: {'-': 0, '+': 0, 'x': 2, 'num': 2},
+            1: {'-': 1, '+': 1, 'x': 2, 'num': 2},
+            2: {'-': 1, '+': 1, '^': 3, '*': 3, '/': 3},
+            3: {'-': 1, '+': 1, 'x': 2, 'num': 2},
+        }
+        current_state = 0
+        equation = "".join(equation.split())
+        terms = re.split(r'([-/+*^])', equation)
+        terms = [x for x in terms if x != '']
+        signs = np.ones(len(terms))
+        i = 0
+        length = len(terms)
+        while i < length:
+            print("state: {}".format(current_state))
+            term = terms[i]
+            print("i: {}, term: {}".format(i, term))
+            try:
+                float(term)
+                transition = 'num'
+            except ValueError:
+                transition = term
+            if transition not in states[current_state]:
+                print(terms)
+                print("transition: {}".format(transition))
+                return "Syntax error", -1
+            print("terms: {}".format(terms))
+            if current_state == 0:
+                if term == '+':
+                    terms.pop(i)
+                    i -= 1
+                elif term == '-':
+                    terms.pop(i)
+                    signs[i] *= -1
+                    i -= 1
+            else:
+                if (terms[i] == '+' and terms[i-1] == '-') or (terms[i] == '-' and terms[i-1] == '+'):
+                    terms[i] = '-'
+                    terms.pop(i-1)
+                    i -= 1
+                elif (terms[i] == '-' and terms[i-1] == '-') or (terms[i] == '+' and terms[i-1] == '+'):
+                    terms[i] = '+'
+                    terms.pop(i-1)
+                    i -= 1
+                elif (terms[i-1] == '*' or terms[i-1] == '/' or terms[i-1] == '^') and terms[i] == '-':
+                    terms.pop(i)
+                    signs[i] *= -1
+                    i -= 1
+                elif (terms[i-1] == '*' or terms[i-1] == '/' or terms[i-1] == '^') and terms[i] == '+':
+                    terms.pop(i)
+                    i -= 1
+            current_state = states[current_state][transition]
+            length = len(terms)
+            i += 1
+
+        return terms, signs
+
+
+        
+
+    
+    def user_message(self, message):
+        dialog = QMessageBox(self)
+        dialog.setWindowTitle("Error")
+        dialog.setText(message)    
+        button = dialog.exec_()
+
+
+        
+
             
             
 
