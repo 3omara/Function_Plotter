@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -55,8 +56,6 @@ class MainWindow(QMainWindow):
         grid = QGridLayout()
         fig = Figure(figsize=(7, 5), dpi=100)
         ax = fig.add_subplot(111)
-        # ax.set_xticks(np.arange(-10, 11, 1))
-        # ax.set_yticks(np.arange(-5, 101, 5))
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         x = np.linspace(-10, 10, 100)
@@ -73,23 +72,42 @@ class MainWindow(QMainWindow):
     
     def plot_button_clicked(self):
         equation = self.equation_text.text()
-        terms, signs = self.validate_state_machine(equation)
-        if terms == "Syntax error":
-            self.user_message("Syntax error")
-            return
         min_x = self.min_x.text()
         max_x = self.max_x.text()
-        sample_size = (int(max_x) - int(min_x))*100
-        x = np.linspace(int(min_x), int(max_x), sample_size)
+
+        if equation == "":
+            self.user_message("Please enter a function to plot!")
+            return
+        if min_x == "" or max_x == "":
+            self.user_message("Please enter a valid range!")
+            return
+        try:
+            float(min_x)
+            float(max_x)
+        except ValueError:
+            self.user_message("The range must be a number!")
+            return
+        if float(min_x) >= float(max_x):
+            self.user_message("Max x must be greater than min x!")
+            return
+        terms, signs = self.validate_state_machine(equation)
+        if terms == "Syntax error":
+            self.user_message("Syntax error!")
+            return
+
+        sample_size = (float(max_x) - float(min_x))/((float(max_x) - float(min_x))*100)
+        x = np.arange(float(min_x), float(max_x), sample_size)
         y = self.equation_solver(terms, signs, x)
         if y == -1:
             return
         fig = Figure(figsize=(7, 5), dpi=100)
         ax = fig.add_subplot(111)
-        max_range2 = max((int(max_x)), y[-1])
-        max_range1 = min((int(min_x)), y[0])
-        ax.set_xlim([max_range1, max_range2])
-        ax.set_ylim([max_range1, max_range2])
+        max_range = max((float(max_x)), y[-1])
+        max_range = max(max_range, y[0])
+        min_range = min((float(min_x)), y[0])
+        min_range = min(min_range, y[-1])
+        ax.set_xlim([min_range, max_range])
+        ax.set_ylim([min_range, max_range])
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.grid()
@@ -98,13 +116,11 @@ class MainWindow(QMainWindow):
         canvas = FigureCanvas(fig)
         self.layout().itemAt(0).widget().layout().addWidget(canvas)
         canvas.draw()
-
     
     def equation_solver(self, terms, signs, x_values):
         y = []
-        print("signs: {}".format(signs))
-        print("terms: {}".format(terms))
         order = []
+        zero_division = False
         for i in range(len(terms)):
             if terms[i] == '^':
                 order.append(i)
@@ -121,7 +137,7 @@ class MainWindow(QMainWindow):
                 if order[j] < order[i]:
                     shifts[i] += 2
         order = [int(x - y) for x, y in zip(order, shifts)]
-        print("order: {}".format(order))
+
         for i in x_values:
             temp = terms.copy()
             for j in range(len(terms)):
@@ -138,6 +154,9 @@ class MainWindow(QMainWindow):
                 elif temp[op] == '*':
                     temp[op-1] = float(temp[op-1]) * float(temp[op+1])
                 elif temp[op] == '/':
+                    if temp[op+1] == 0:
+                        zero_division = True
+                        break
                     temp[op-1] = float(temp[op-1]) / float(temp[op+1])
                 elif temp[op] == '+':
                     temp[op-1] = float(temp[op-1]) + float(temp[op+1])
@@ -145,8 +164,10 @@ class MainWindow(QMainWindow):
                     temp[op-1] = float(temp[op-1]) - float(temp[op+1])
                 temp.pop(op)
                 temp.pop(op)
-            # print('i: {}, res: {}'.format(i, temp[0]))
-            y.append(temp[0])
+            if zero_division:
+                y.append(float('nan'))
+            else:
+                y.append(temp[0])
                 
         
         return y
@@ -166,19 +187,14 @@ class MainWindow(QMainWindow):
         i = 0
         length = len(terms)
         while i < length:
-            print("state: {}".format(current_state))
             term = terms[i]
-            print("i: {}, term: {}".format(i, term))
             try:
                 float(term)
                 transition = 'num'
             except ValueError:
                 transition = term
             if transition not in states[current_state]:
-                print(terms)
-                print("transition: {}".format(transition))
                 return "Syntax error", -1
-            print("terms: {}".format(terms))
             if current_state == 0:
                 if term == '+':
                     terms.pop(i)
@@ -209,21 +225,11 @@ class MainWindow(QMainWindow):
 
         return terms, signs
 
-
-        
-
-    
     def user_message(self, message):
         dialog = QMessageBox(self)
         dialog.setWindowTitle("Error")
         dialog.setText(message)    
-        button = dialog.exec_()
-
-
-        
-
-            
-            
+        dialog.exec_()
 
 window = MainWindow()
 
