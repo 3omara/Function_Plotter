@@ -8,7 +8,6 @@ import re
 from PySide2.QtCore import QSize, Qt
 from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QVBoxLayout, QWidget, QHBoxLayout, QLabel, QGridLayout, QMessageBox
 
-app = QApplication([])
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -82,31 +81,39 @@ class MainWindow(QMainWindow):
         min_x = self.min_x.text()
         max_x = self.max_x.text()
 
+        # check if the user entered a function and a valid range
         if equation == "":
             self.user_message("Please enter a function to plot!")
             return
         if min_x == "" or max_x == "":
             self.user_message("Please enter a valid range!")
             return
+        # check if the range is a number
         try:
             float(min_x)
             float(max_x)
         except ValueError:
             self.user_message("The range must be a number!")
             return
+        # check if the minimum x is less than the maximum x
         if float(min_x) >= float(max_x):
-            self.user_message("Max x must be greater than min x!")
+            self.user_message("The range must be in ascending order!")
             return
+        # get the list of terms and signs to be used
         terms, signs = self.validate_state_machine(equation)
+        # output an error message if the syntax is invalid
         if terms == "Syntax error":
             self.user_message("Syntax error!")
             return
 
+        # calculate a sample size relative to the range
         sample_size = (float(max_x) - float(min_x))/((float(max_x) - float(min_x))*100)
+        # generate x values between the minimum and maximum x values with the calculated sample size
         x = np.arange(float(min_x), float(max_x), sample_size)
+        # generate y values using the equation solver
         y = self.equation_solver(terms, signs, x)
-        if y == -1:
-            return
+
+        # plot the function
         fig = Figure(figsize=(7, 5), dpi=75)
         ax = fig.add_subplot(111)
         # max_range = max((float(max_x)), y[-1])
@@ -189,8 +196,7 @@ class MainWindow(QMainWindow):
                 # if division by zero occurs, add a nan value to the list
                 y.append(float('nan'))
             else:
-                y.append(temp[0])
-                
+                y.append(temp[0])               
         
         return y
     
@@ -265,12 +271,14 @@ class MainWindow(QMainWindow):
 
     # function responsible for displaying error messages
     def user_message(self, message):
-        dialog = QMessageBox(self)
-        dialog.setWindowTitle("Error")
-        dialog.setText(message)    
-        dialog.exec_()
+        self.dialog = QMessageBox(self)
+        self.dialog.setWindowTitle("Error")
+        self.dialog.setText(message)    
+        self.dialog.exec_()
 
-window = MainWindow()
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainWindow()
 
-window.show()
-app.exec_()
+    window.show()
+    app.exec_()
