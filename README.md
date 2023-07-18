@@ -2,7 +2,7 @@
 
 ## Description
 
-This simple function plotter can plot any valid functions in one variable. The GUI is written in PySide2 and the plotting is done using matplotlib. The user can enter the function in the top text box and indicate the range of the x variable in the below text boxes. The program will then plot the function in the specified range. The plot could look strange due to scaling issues. The program supports the following operations: +, -, *, /, ^. The program performs the operations in the PEMDAS order. Two consecutive positive or negative signs are reduced to a single positive sign while neigbouring heterogeneous signs are reduced to a negative sign. The program has a scale check button used to adjust the scale of the plot. To illustrate, if this button is checked, the same ranges will be used for the y and x-axis of the plot ensuring the plot is to scale. While unchecked, the plot can look weird since the scale of the y-axis is different from that of the x-axis.    
+This simple function plotter can plot any valid functions in one variable. The GUI is written in PySide2 and the plotting is done using matplotlib. The user can enter the function in the top text box and indicate the range of the x variable in the below text boxes. The program will then plot the function in the specified range. The plot could look strange due to scaling issues. The program supports the following operations: +, -, *, /, ^. The program performs the operations in the PEMDAS order. Two consecutive positive or negative signs are reduced to a single positive sign while neigbouring heterogeneous signs are reduced to a negative sign. The program has a scale check button used to adjust the scale of the plot. To illustrate, if this button is checked, the same ranges will be used for the y and x-axis of the plot ensuring the plot is to scale. While unchecked, the plot can look weird since the scale of the y-axis is different from that of the x-axis. An example will be shown below.    
 
 After the user enters the function and the range, the program will do the following:
 
@@ -61,7 +61,11 @@ Successful examples:
 
 Note: for this image, the scale button is checked.
 
-![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1) VS ![image](https://github.com/3omara/Function_Plotter/assets/61950995/145fb653-c8a0-4713-9a7c-de7f009fd215)
+![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1) 
+
+Notice the difference when the scale button is unchecked back again using the same previous function.
+
+![image](https://github.com/3omara/Function_Plotter/assets/61950995/145fb653-c8a0-4713-9a7c-de7f009fd215)
 
 
 
