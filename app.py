@@ -22,6 +22,10 @@ class MainWindow(QMainWindow):
         # A button to plot the function when the user is ready
         self.button = QPushButton("Plot")
         self.button.clicked.connect(self.plot_button_clicked)
+        self.button.setFixedSize(QSize(100, 30))
+        self.button.setStyleSheet("QPushButton {background-color: #f0f0f0; border: 1px solid #d0d0d0; border-radius: 5px;} \
+                                  QPushButton:hover {background-color: #d0d0d0;} \
+                                  QPushButton:pressed {background-color: #a0a0a0;} ")
 
         root_layout = QVBoxLayout()
 
@@ -32,18 +36,35 @@ class MainWindow(QMainWindow):
         # function entry layout is added to the vertical root layout 
         root_layout.addLayout(eq_layout)
 
+        # scale switch button
+        self.scale_button = QPushButton("Scale")
+        self.scale_button.setCheckable(True)
+        self.scale_button.setFixedSize(QSize(100, 30))
+        self.scale_button.setStyleSheet("QPushButton {background-color: #f0f0f0; border: 1px solid #d0d0d0; border-radius: 5px; } \
+                                        QPushButton:checked {background-color: #d0d0d0;}")
+        scale_layout = QHBoxLayout()
+        scale_layout.addWidget(self.scale_button)
+        scale_layout.setAlignment(Qt.AlignRight)
+
         # x range entry
         self.min_x = QLineEdit("-10") # default minimum x
-        self.min_x.setAlignment(Qt.AlignCenter)
         self.min_x.setFixedWidth(100)
+        self.min_x.setStyleSheet("QLineEdit {margin: 10px;}")
+
         self.max_x = QLineEdit("10") # default maximum x
         self.max_x.setFixedWidth(100)
-        self.max_x.setAlignment(Qt.AlignCenter)
+        self.max_x.setStyleSheet("QLineEdit {margin: 10px;}")
+
         left_angle_bracket = QLabel("<")
         left_angle_bracket.setFixedSize(QSize(10, 10))
+        left_angle_bracket.setStyleSheet("QLabel {font-size: 15px;} margin: 10px;")
+
         right_angle_bracket = QLabel("<")
         right_angle_bracket.setFixedSize(QSize(10, 10))
+        right_angle_bracket.setStyleSheet("QLabel {font-size: 15px;} margin: 10px;")
+
         x_label = QLabel("x")
+
         x_label.setFixedSize(QSize(10, 10))
 
         # x range entry is laid out horizontally
@@ -53,9 +74,12 @@ class MainWindow(QMainWindow):
         x_layout.addWidget(x_label)
         x_layout.addWidget(right_angle_bracket)
         x_layout.addWidget(self.max_x)
-        x_layout.setSpacing(0)
-        # x range entry layout is added to the vertical root layout
-        root_layout.addLayout(x_layout)
+        x_layout.setAlignment(Qt.AlignCenter)
+        # x range entry layout is with scale layout to another horizontal layout and then added to the vertical root layout
+        second_row_layout = QHBoxLayout()
+        second_row_layout.addLayout(x_layout)
+        second_row_layout.addLayout(scale_layout)
+        root_layout.addLayout(second_row_layout)
 
         # canvas view to display the plot
         fig = Figure(figsize=(7, 5), dpi=75)
@@ -80,6 +104,7 @@ class MainWindow(QMainWindow):
         equation = self.equation_text.text()
         min_x = self.min_x.text()
         max_x = self.max_x.text()
+        scale = self.scale_button.isChecked()
 
         # check if the user entered a function and a valid range
         if equation == "":
@@ -116,12 +141,14 @@ class MainWindow(QMainWindow):
         # plot the function
         fig = Figure(figsize=(7, 5), dpi=75)
         ax = fig.add_subplot(111)
-        # max_range = max((float(max_x)), y[-1])
-        # max_range = max(max_range, y[0])
-        # min_range = min((float(min_x)), y[0])
-        # min_range = min(min_range, y[-1])
-        # ax.set_xlim([min_range, max_range])
-        # ax.set_ylim([min_range, max_range])
+        
+        if(scale):
+            max_range = max((float(max_x)), y[-1])
+            max_range = max(max_range, y[0])
+            min_range = min((float(min_x)), y[0])
+            min_range = min(min_range, y[-1])
+            ax.set_xlim([min_range, max_range])
+            ax.set_ylim([min_range, max_range])
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.grid()
