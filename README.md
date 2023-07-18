@@ -12,6 +12,8 @@ After the user enters the function and the range, the program will do the follow
 * Second, the program uses the **equation_solver()** function to solve the user function using the resulting tokens and signs from the previous step. It orders the operations in the PEMDAS order before iterating through the tokens multiplying each token by its sign. Any division by zero substitutes the corresponding y value with nan. The function only returns a list of y values.
 * Finally, the program plots the function using the **plot_button_clicked()** function. It uses the resulting y values from the previous step and plots them against the x values in the specified range using matplotlib.
 
+There are three test files for this program: **test_app.py**, **test_equation_solver.py**, and **test_validate_state_machine.py**. The first file tests the GUI, the second file tests the equation_solver() function, and the third file tests the validate_state_machine() function.
+
 ## Running the program
 
 Run the program by running the app.py file:
