@@ -23,22 +23,27 @@ python app.py
 ## Snapshots
 
 Default plot:
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/281b550f-e0f9-45f1-b514-5d3df80b4eeb)
 
 
 Dialog message when no function is entered:
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/c78e2fc9-53ec-4e07-a84c-2711a2cde8ff)
 
 
 Dialog message when entering an invalid function:
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/b4c602ab-3d61-40cf-bde8-99d494fb4b33)
 
 
 Dialog message when the range is not entered or only partially so:
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/58671b8e-a329-467e-92b1-d3d7604208ff)
 
 
 Dialog message when the range is reversed:
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/4c55f7b1-52e2-487a-9b89-bcd8199035bd)
 
 
@@ -54,7 +59,8 @@ Successful examples:
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/7aa91f7e-9c62-4b3a-a73c-6a4d4e1e62e7)
 
 
-Note: for this image, the scale button is checked. 
+Note: for this image, the scale button is checked.
+
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1)
 
 
