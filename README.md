@@ -61,7 +61,8 @@ Successful examples:
 
 Note: for this image, the scale button is checked.
 
-![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1)
+![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1) VS ![image](https://github.com/3omara/Function_Plotter/assets/61950995/145fb653-c8a0-4713-9a7c-de7f009fd215)
+
 
 
 
