@@ -267,6 +267,10 @@ class MainWindow(QMainWindow):
             length = len(terms)
             i += 1
 
+            if i == length and current_state != 2:
+                # if the last term is an operator, the syntax is invalid
+                return "Syntax error", -1
+
         return terms, signs
 
     # function responsible for displaying error messages
