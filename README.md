@@ -6,7 +6,8 @@ This simple function plotter can plot any valid functions in one variable. The G
 
 After the user enters the function and the range, the program will do the following:
 
-* First, the program validates the dunction using the **validate_state_machine()** function This function uses a state machine to validate the function entered by the user. It returns a list of tokens and another list of signs. The tokens array contains the tokens in the function if the function is valid; otherwise, it returns a string: "Syntax Error". The FSM is shown below:
+* First, the program validates the function using the **validate_state_machine()** function This function uses a state machine to validate the function entered by the user. It returns a list of tokens and another list of signs. The tokens array contains the tokens in the function if the function is valid; otherwise, it returns a string: "Syntax Error". The FSM is shown below:
+
 ![FSM drawio](https://github.com/3omara/Function_Plotter/assets/61950995/6fdd0c51-2296-4d2a-976e-598a92c4a34e)
 
 * Second, the program uses the **equation_solver()** function to solve the user function using the resulting tokens and signs from the previous step. It orders the operations in the PEMDAS order before iterating through the tokens multiplying each token by its sign. Any division by zero substitutes the corresponding y value with nan. The function only returns a list of y values.
@@ -24,32 +25,27 @@ python app.py
 
 ## Snapshots
 
-Default plot:
+###Default plot:
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/281b550f-e0f9-45f1-b514-5d3df80b4eeb)
 
 
-Dialog message when no function is entered:
+###Dialog message when no function is entered:
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/c78e2fc9-53ec-4e07-a84c-2711a2cde8ff)
 
 
-Dialog message when entering an invalid function:
+###Dialog message when entering an invalid function:
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/b4c602ab-3d61-40cf-bde8-99d494fb4b33)
 
 
-Dialog message when the range is not entered or only partially so:
+###Dialog message when the range is not entered or only partially so:
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/58671b8e-a329-467e-92b1-d3d7604208ff)
 
 
-Dialog message when the range is reversed:
-
-![image](https://github.com/3omara/Function_Plotter/assets/61950995/4c55f7b1-52e2-487a-9b89-bcd8199035bd)
-
-
-Successful examples:
+###Successful examples:
 
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/f2fb0c92-e964-43ee-8818-dc923ec0e505)
@@ -61,11 +57,11 @@ Successful examples:
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/7aa91f7e-9c62-4b3a-a73c-6a4d4e1e62e7)
 
 
-Note: for this image, the scale button is checked.
+###Note: for this image, the scale button is checked.
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/25aed72a-eea6-4719-836b-be76d23c59b1) 
 
-Notice the difference when the scale button is unchecked back again using the same previous function.
+###Notice the difference when the scale button is unchecked back again using the same previous function.
 
 ![image](https://github.com/3omara/Function_Plotter/assets/61950995/145fb653-c8a0-4713-9a7c-de7f009fd215)
 
